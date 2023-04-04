@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Test cases
+p2_tc*
+
+# Output
+htree
