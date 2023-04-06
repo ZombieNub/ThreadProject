@@ -88,6 +88,8 @@ main(int argc, char** argv)
   double end = GetTime();
   printf("hash value = %u \n", hash);
   printf("time taken = %f \n", (end - start));
+  // Free hash_return since we no longer need it
+  free(hash_return);
   close(fd);
   return EXIT_SUCCESS;
 }
@@ -124,8 +126,13 @@ void* hash_thread(void* hash_data_input) {
 		Pthread_join(right, (void**)&right_hash_ptr);
     // Now we need to join these values into a single string and evaluate its hash
     uint8_t new_length = sprintf(new_hash, "%u%u%u", center_hash, *left_hash_ptr, *right_hash_ptr);
+    // Free left_hash_ptr and right_hash_ptr, since they were created using malloc
+    free(left_hash_ptr);
+    free(right_hash_ptr);
     // char is the same as uint8_t
     *hash_ptr = jenkins_one_at_a_time_hash((uint8_t*)new_hash, new_length);
+    // Free new_hash, since it's not needed anymore
+    free(new_hash);
     pthread_exit(hash_ptr);
   } else if ((data.thread_number * 2) + 1 < data.max_threads) {
     // We can only spawn a left child
@@ -150,8 +157,12 @@ void* hash_thread(void* hash_data_input) {
     Pthread_join(left, (void**)&left_hash_ptr);
     // Now we need to join these values into a single string and evaluate its hash
     uint8_t new_length = sprintf(new_hash, "%u%u", center_hash, *left_hash_ptr);
+    // Free left_hash_ptr, since it was created using malloc
+    free(left_hash_ptr);
     // char is the same as uint8_t
     *hash_ptr = jenkins_one_at_a_time_hash((uint8_t*)new_hash, new_length);
+    // Again, free new-hash since we don't need it
+    free(new_hash);
     pthread_exit(hash_ptr);
   } else {
     // We cannot spawn any children, so we are simply a leaf!
