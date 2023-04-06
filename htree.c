@@ -75,7 +75,7 @@ main(int argc, char** argv)
   head_data.nblocks = nblocks;
   head_data.thread_number = 0;
   head_data.max_threads = max_threads;
-  // Now we can ge the hash
+  // Now we can get the hash
 
   double start = GetTime();
 
